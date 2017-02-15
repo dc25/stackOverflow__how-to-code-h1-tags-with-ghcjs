@@ -1,20 +1,22 @@
 import GHCJS.DOM (runWebGUI, webViewGetDomDocument)
 import GHCJS.DOM.Document (getBody, createElement)
 import GHCJS.DOM.Element (click, setInnerHTML)
-import GHCJS.DOM.HTMLButtonElement (castToHTMLButtonElement)
+import GHCJS.DOM.HTMLHeadingElement (castToHTMLHeadingElement)
+import GHCJS.DOM.HTMLParagraphElement (castToHTMLParagraphElement)
 import GHCJS.DOM.Node (appendChild)
 import GHCJS.DOM.EventM (on)
-import Control.Monad.Trans (liftIO)
-import Data.JSString (JSString, pack)
-
-foreign import javascript unsafe 
-   "alert($1)" 
-   alert :: JSString -> IO ()
 
 main = runWebGUI $ \win -> do
         Just doc <- webViewGetDomDocument win
         Just body <- getBody doc
-        Just button <- fmap castToHTMLButtonElement <$> createElement doc (Just "button")
-        appendChild body $ Just button
-        on button click $ liftIO $ alert $ pack "OUCH!" 
-        setInnerHTML button (Just "voila!")
+
+        Just h1 <- fmap castToHTMLHeadingElement <$> createElement doc (Just "h1")
+        appendChild body $ Just h1
+        setInnerHTML h1 (Just "Hello World")
+        on h1 click $ setInnerHTML h1 (Just "Clicked")
+
+        Just p <- fmap castToHTMLParagraphElement <$> createElement doc (Just "p")
+        appendChild body $ Just p
+        setInnerHTML p (Just "This is my test document.")
+
+        return ()
